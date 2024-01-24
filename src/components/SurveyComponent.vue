@@ -45,7 +45,7 @@
                   {{ option.text }}
                 </option>
               </select>
-          <input v-if="reponse.typeUsager === 'Autre'" class="form-control" type="text" v-model="reponse.precision_Type_Usager" placeholder="Prenom enqueteur">
+          <input v-if="reponse.typeUsager === 'Autre'" class="form-control" type="text" v-model="reponse.precision_Type_Usager" placeholder="Precisions">
               <button v-if="reponse.typeUsager || reponse.typeUsager === 'Autre' && precision_Type_Usager " @click="next" class="btn-submit">Done</button>
               <button @click="back" class="btn-return">retour</button>
             </div>
@@ -210,8 +210,8 @@ body {
 .container {
   background-color: #1e1e1e;
   color: white;
-  width: 75%;
   padding: 5% 0;
+  width: 75%;
   margin: auto;
 }
 

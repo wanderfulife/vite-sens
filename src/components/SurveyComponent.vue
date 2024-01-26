@@ -13,7 +13,7 @@
         <div v-if="choice === 0" class="form-group">
           <input class="form-control" type="text" v-model="reponse.enqueteur" placeholder="Prenom enqueteur"
             @keydown.enter.prevent />
-          <button v-if="reponse.enqueteur.length >= 3" @click="next" class="btn-submit">Suivant</button>
+          <button v-if="reponse.enqueteur" @click="next" class="btn-submit">Suivant</button>
         </div>
 
         <div v-if="choice === 1" class="form-group">
@@ -38,7 +38,7 @@
       </div>
 
       <div v-else>
-        <div v-if="reponse.usager === 'Usager'">
+        <div v-if="reponse.usager === 'Usager' && choice_nu === 0">
           <h1>QCo1 - Par rapport à votre venue en gare :</h1>
           <select id="QCo1" v-model="reponse.typeUsager" class="form-control">
             <option v-for="option in typeUsagers" :key="option.id" :value="option.output">
@@ -47,9 +47,16 @@
           </select>
           <input v-if="reponse.typeUsager === 'Autre'" class="form-control" type="text"
             v-model="reponse.precision_Type_Usager" placeholder="Precisions">
-          <button @click="buttonSecondSet" class="btn-submit">Done</button>
+          <button v-if="reponse.typeUsager" @click="next_nu" class="btn-submit">Done</button>
           <button @click="backSecondSet" class="btn-return">retour</button>
         </div>
+
+        <div v-if="reponse.typeUsager === 'Partant' && choice_nu === 1">
+            <h1>QP1 - Quelle sera votre gare de destination? </h1>
+                <CommuneSelector v-model="reponse.gare" />
+            <button @click="next_nu" class="btn-submit">Done</button>
+            <button @click="backSecondSet" class="btn-return">retour</button>
+          </div>
 
         <div v-else-if="reponse.usager === 'Non-usager'">
           <h1>QNU2 - Néanmoins à quelle fréquence allez-vous en gare de Sens ?</h1>
@@ -84,7 +91,8 @@
 <script setup>
 import { ref } from "vue";
 import { usagers, sexes, typeUsagers, frequence, parking } from "./reponses";
-import { db } from "../../firebaseConfig";
+import { db } from "../firebaseConfig";
+import CommuneSelector from './CommuneSelector.vue';
 import { collection, addDoc, getDocs } from "firebase/firestore";
 import * as XLSX from "xlsx";
 
@@ -93,7 +101,7 @@ const surveyCollectionRef = collection(db, "Caen");
 const start = ref(false);
 const startDate = ref('')
 const choice = ref(0);
-const choiceVL = ref(0);
+const choice_nu = ref(0);
 const showSecondSet = ref(false);
 const reponse = ref({
   NU_Frequence: "",
@@ -102,7 +110,8 @@ const reponse = ref({
   usager: "",
   typeUsager: "",
   precision_Type_Usager: "",
-  parking: ""
+  parking: "",
+  gare: ""
 });
 
 const startSurvey = () => {
@@ -116,6 +125,14 @@ const next = () => {
 
 const back = () => {
   choice.value--;
+};
+
+const next_nu = () => {
+  choice_nu.value++;
+};
+
+const back_nu = () => {
+  choice_nu.value--;
 };
 
 const buttonSecondSet = () => {
@@ -140,11 +157,13 @@ const submitSurvey = async () => {
     Type_Usager: reponse.value.typeUsager,
     Precision_Type_Usager: reponse.value.precision_Type_Usager,
     NU_Frequence: reponse.value.NU_Frequence,
-    NU_Usage_parking: reponse.value.parking
+    NU_Usage_parking: reponse.value.parking,
+    P_Gare_Destination: reponse.value.gare
   });
   choice.value = 0;
-  choiceVL.value = 0;
-  reponse.precision_Type_Usager = "";
+  choice_nu.value = 0;
+  reponse.gare.value = "";
+  reponse.value.precision_Type_Usager = "";
   reponse.value.enqueteur = "";
   reponse.value.sexe = "";
   reponse.value.usager = "";
@@ -175,7 +194,8 @@ const downloadData = async () => {
         Type_Usager: docData.Type_Usager || "", // Type usager
         Precision_Type_Usager: docData.Precision_Type_Usager || "",
         NU_Frequence: docData.NU_Frequence || "",
-        NU_Usage_parking: docData.NU_Usage_parking || ""
+        NU_Usage_parking: docData.NU_Usage_parking || "",
+        P_Gare_Destination : docData.P_Gare_Destination || ""
       };
       data.push(mappedData);
     });
@@ -204,7 +224,8 @@ const downloadData = async () => {
         "Usager_train",
         "Type_Usager",
         "Precision_Type_Usager",
-        "NU_Frequence"
+        "NU_Frequence",
+        "P_Gare_Destination"
       ],
       skipHeader: false,
     });

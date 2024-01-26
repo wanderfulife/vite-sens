@@ -1,54 +1,37 @@
 <template>
   <div class="form-group">
-    <input class="form-control" type="text" v-model="localPostalCodePrefix"
-      placeholder="Code Postal (Premiers chiffres)" />
-    <input class="form-control" type="text" :value="modelValue" @input="updateCommune($event.target.value)"
-      placeholder="COMMUNE" />
+    <input class="form-control" type="text" v-model="searchTerm" @input="showDropdown = true" placeholder="Nom Gare" />
 
-    <ul v-if="showDropdown && modelValue && filteredCommunes.length" class="commune-dropdown">
-      <li v-for="(item, index) in filteredCommunes" :key="`${item['CODE INSEE']}-${index}`" @click="selectCommune(item)">
-        {{ item.COMMUNE }} - {{ item.DEPARTEMENT }}
+    <ul v-if="showDropdown && filteredGares.length" class="gare-dropdown">
+      <li v-for="(item, index) in filteredGares" :key="`${item['Code UIC']}-${index}`" @click="selectGare(item)">
+        {{ item['Nom Gare'] }}
       </li>
     </ul>
   </div>
 </template>
 
+
 <script setup>
-import { ref, computed, watch } from 'vue';
-import insee from "./output.json";
+import { ref, computed } from 'vue';
+import gares from "./output.json";
 
-const props = defineProps({
-  modelValue: String,
-  postalCodePrefix: String
-});
-
-const emit = defineEmits(['update:modelValue']);
-
-const localPostalCodePrefix = ref(props.postalCodePrefix);
+const searchTerm = ref('');
 const showDropdown = ref(false);
 
-// Watch for changes in the postalCodePrefix prop
-watch(() => props.postalCodePrefix, (newVal) => {
-  localPostalCodePrefix.value = newVal;
-});
-
-const updateCommune = (newValue) => {
-  emit('update:modelValue', newValue);
-  showDropdown.value = true;
-};
-
-const selectCommune = (item) => {
-  emit('update:modelValue', `${item.COMMUNE} - ${item.DEPARTEMENT}`);
+const selectGare = (item) => {
+  searchTerm.value = item['Nom Gare'];
   showDropdown.value = false;
 };
 
-const filteredCommunes = computed(() => {
-  return insee.filter(item => {
-    const postalCode = item['CODE POSTAL'] ? item['CODE POSTAL'].toString() : '';
-    const commune = item.COMMUNE ? item.COMMUNE.toLowerCase() : '';
-    const matchesPostalCode = postalCode.startsWith(localPostalCodePrefix.value);
-    const matchesCommune = commune.includes(props.modelValue.toLowerCase());
-    return matchesPostalCode && matchesCommune;
+const filteredGares = computed(() => {
+  if (!searchTerm.value) {
+    return [];
+  }
+  return gares.filter(item => {
+    const nomGare = item['Nom Gare'] ? item['Nom Gare'].toLowerCase() : '';
+    return nomGare.includes(searchTerm.value.toLowerCase());
   });
 });
 </script>
+
+

@@ -1,16 +1,13 @@
 <template>
   <div class="container">
-    <div >
-      <h1 v-if="choice === 0" >Sens</h1>
-      <h1 v-if="choice === 1" >Sexe de la personne interviewée</h1>
-      <h1 v-if="choice === 2" >L'usager interviewé voyage en train ?</h1>
-      <h1 v-if="choice === 3" >Type d'usager interviewé</h1>
-      <h1 v-if="choice === 4" >Finish</h1>
-
+    <div>
+      <h1 v-if="choice === 0">Sens</h1>
+      <h1 v-if="choice === 1">Sexe de la personne interviewée</h1>
+      <h1 v-if="choice === 2">L'usager interviewé voyage en train ?</h1>
     </div>
-  <div v-if="!start">
+    <div v-if="!start">
       <button @click="startSurvey" class="btn-fin">COMMENCER QUESTIONNAIRE</button>
-  </div>
+    </div>
     <form v-else @submit.prevent="submitSurvey">
       <div v-if="!showSecondSet">
         <div v-if="choice === 0" class="form-group">
@@ -30,35 +27,63 @@
         </div>
 
         <div v-if="choice === 2" class="form-group">
-            <select id="usager" v-model="reponse.usager" class="form-control">
-              <option v-for="option in usagers" :key="option.id" :value="option.output">
+          <select id="QCo0" v-model="reponse.usager" class="form-control">
+            <option v-for="option in usagers" :key="option.id" :value="option.output">
+              {{ option.text }}
+            </option>
+          </select>
+          <button v-if="reponse.usager" @click="buttonSecondSet" class="btn-submit">Suivant</button>
+          <button @click="back" class="btn-return">retour</button>
+        </div>
+      </div>
+
+      <div v-else>
+        <div v-if="reponse.usager === 'Usager'">
+          <h1>QCo1 - Par rapport à votre venue en gare :</h1>
+          <select id="QCo1" v-model="reponse.typeUsager" class="form-control">
+            <option v-for="option in typeUsagers" :key="option.id" :value="option.output">
+              {{ option.text }}
+            </option>
+          </select>
+          <input v-if="reponse.typeUsager === 'Autre'" class="form-control" type="text"
+            v-model="reponse.precision_Type_Usager" placeholder="Precisions">
+          <button @click="buttonSecondSet" class="btn-submit">Done</button>
+          <button @click="backSecondSet" class="btn-return">retour</button>
+        </div>
+
+        <div v-else-if="reponse.usager === 'Non-usager'">
+          <h1>QNU2 - Néanmoins à quelle fréquence allez-vous en gare de Sens ?</h1>
+          <select id="QNu2" v-model="reponse.NU_Frequence" class="form-control">
+            <option v-for="option in frequence" :key="option.id" :value="option.output">
+              {{ option.text }}
+            </option>
+          </select>
+          <div v-if="reponse.NU_Frequence === '1ière' || reponse.NU_Frequence === 'Jamais'">
+            <input type="submit" value="Submit Survey" class="btn-fin" />
+          </div>
+          <div
+            v-else-if="reponse.NU_Frequence === 'Ts les jrs' || reponse.NU_Frequence === '1-2 / smn' || reponse.NU_Frequence === 'Plrs / mois' || reponse.NU_Frequence === '-1 / mois' || reponse.NU_Frequence === 'Ts les ans'">
+            <h1>QNU3 - Lorsque vous allez en gare, utilisez-vous ce parking ?</h1>
+            <select id="QNu3" v-model="reponse.parking" class="form-control">
+              <option v-for="option in parking" :key="option.id" :value="option.output">
                 {{ option.text }}
               </option>
             </select>
-            <button v-if="reponse.usager" @click="next" class="btn-submit">Suivant</button>
-            <button @click="back" class="btn-return">retour</button>
+            <input type="submit" value="Submit Survey" class="btn-fin" />
           </div>
-
-          <div v-if="choice === 3" class="form-group">
-              <select id="usager" v-model="reponse.typeUsager" class="form-control">
-                <option v-for="option in typeUsagers" :key="option.id" :value="option.output">
-                  {{ option.text }}
-                </option>
-              </select>
-          <input v-if="reponse.typeUsager === 'Autre'" class="form-control" type="text" v-model="reponse.precision_Type_Usager" placeholder="Precisions">
-              <button v-if="reponse.typeUsager || reponse.typeUsager === 'Autre' && precision_Type_Usager " @click="next" class="btn-submit">Done</button>
-              <button @click="back" class="btn-return">retour</button>
-            </div>
+          <button @click="backSecondSet" class="btn-return">retour</button>
+        </div>
       </div>
-       <input v-show="allFieldsFilled" type="submit" value="Terminer" class="btn-fin" :disabled="isSubmitDisabled" />
-      </form>
+
+
+    </form>
   </div>
   <button @click="downloadData" class="btn-data">Download Data</button>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
-import { usagers, sexes, typeUsagers } from "./reponses";
+import { ref } from "vue";
+import { usagers, sexes, typeUsagers, frequence, parking } from "./reponses";
 import { db } from "../../firebaseConfig";
 import { collection, addDoc, getDocs } from "firebase/firestore";
 import * as XLSX from "xlsx";
@@ -71,11 +96,13 @@ const choice = ref(0);
 const choiceVL = ref(0);
 const showSecondSet = ref(false);
 const reponse = ref({
+  NU_Frequence: "",
   enqueteur: "",
   sexe: "",
   usager: "",
   typeUsager: "",
   precision_Type_Usager: "",
+  parking: ""
 });
 
 const startSurvey = () => {
@@ -91,24 +118,15 @@ const back = () => {
   choice.value--;
 };
 
+const buttonSecondSet = () => {
+  showSecondSet.value = true;
+  choice.value++;
+}
+const backSecondSet = () => {
+  showSecondSet.value = false;
+  choice.value--;
+}
 
-const allFieldsFilled = computed(() => {
-  return (
-    reponse.value.enqueteur !== "" &&
-    reponse.value.sexe !== "" &&
-    reponse.value.usager !== "" &&
-    reponse.value.typeUsager !== ""
-  );
-});
-
-const isSubmitDisabled = computed(() => {
-  return (
-    reponse.value.enqueteur === "" ||
-    reponse.value.sexe === "" ||
-    reponse.value.usager === "" ||
-    reponse.value.typeUsager === "" 
-  );
-});
 
 const submitSurvey = async () => {
   await addDoc(surveyCollectionRef, {
@@ -121,6 +139,8 @@ const submitSurvey = async () => {
     Usager_train: reponse.value.usager,
     Type_Usager: reponse.value.typeUsager,
     Precision_Type_Usager: reponse.value.precision_Type_Usager,
+    NU_Frequence: reponse.value.NU_Frequence,
+    NU_Usage_parking: reponse.value.parking
   });
   choice.value = 0;
   choiceVL.value = 0;
@@ -129,9 +149,10 @@ const submitSurvey = async () => {
   reponse.value.sexe = "";
   reponse.value.usager = "";
   reponse.value.typeUsager = "";
+  reponse.value.NU_Frequence = "";
+  reponse.value.parking = "";
   showSecondSet.value = false;
   start.value = false;
-
 };
 
 const downloadData = async () => {
@@ -144,7 +165,7 @@ const downloadData = async () => {
       let docData = doc.data();
       let mappedData = {
         ID_questionnaire: doc.id, // Firebase document ID
-        HEURE_DEBUT : docData.HEURE_DEBUT || "",
+        HEURE_DEBUT: docData.HEURE_DEBUT || "",
         HEURE_FIN: docData.HEURE_FIN || "", // Heure
         ENQUETEUR: docData.ENQUETEUR || "", // Name
         SEXE: docData.SEXE || "", // Sexe
@@ -152,15 +173,16 @@ const downloadData = async () => {
         JOUR: docData.JOUR || "",
         Usager_train: docData.Usager_train || "", // Usager train / non usager
         Type_Usager: docData.Type_Usager || "", // Type usager
-        Precision_Type_Usager : docData.Precision_Type_Usager || "",
-     
+        Precision_Type_Usager: docData.Precision_Type_Usager || "",
+        NU_Frequence: docData.NU_Frequence || "",
+        NU_Usage_parking: docData.NU_Usage_parking || ""
       };
       data.push(mappedData);
     });
 
     // Calculate the maximum width for each column, considering the minimum width
     // Adjust this factor as needed for padding or wider characters
- const scalingFactor = 1.5; // Increased scaling factor for better visibility
+    const scalingFactor = 2; // Increased scaling factor for better visibility
     Object.keys(data[0]).forEach((key) => {
       let maxLen = Math.max(
         ...data.map((item) => item[key].toString().length),
@@ -182,6 +204,7 @@ const downloadData = async () => {
         "Usager_train",
         "Type_Usager",
         "Precision_Type_Usager",
+        "NU_Frequence"
       ],
       skipHeader: false,
     });
@@ -219,6 +242,7 @@ label {
   display: block;
   margin-bottom: 5px;
 }
+
 .form-group {
   margin-bottom: 15px;
 }
@@ -234,9 +258,11 @@ label {
   text-transform: uppercase;
 }
 
-.form-control, .btn-submit {
+.form-control,
+.btn-submit {
   box-sizing: border-box;
 }
+
 .btn-submit {
   width: 100%;
   background-color: #4caf50;
@@ -324,9 +350,10 @@ h1 {
   background-color: #f0f0f0;
 }
 
-input, select, button {
+input,
+select,
+button {
   font-size: 16px;
-  padding: 10px ;
+  padding: 10px;
 }
-
 </style>

@@ -15,60 +15,75 @@ const usagers = [
 	{
 		id: 1,
 		output: "Usager",
-		text: "Usager",
+		text: "Oui",
 	},
 	{
 		id: 2,
 		output: "Non-usager",
-		text: "Non-usager",
+		text: "Non",
 	}
 ];
+
+const parking = [
+	{
+		id: 1,
+		output: "Oui",
+		text: "Oui",
+	},
+	{
+		id: 2,
+		output: "Non",
+		text: "Non",
+	}
+];
+
+
 
 const typeUsagers = [
 	{
 		id: 1,
 		output: "Partant",
-		text: "Partant",
+		text: "Vous allez prendre un train ?",
 	},
 	{
 		id: 2,
 		output: "Arrivant",
-		text: "Arrivant",
+		text: "Vous êtes descendu d'un train ?",
 	},
 	{
 		id: 3,
 		output: "Attendre",
-		text: "Attendre",
+		text: "Vous venez attendre quelqu'un ?",
 	},
 	{
 		id: 4,
 		output: "Accompagner",
-		text: "Accompagner",
+		text: "Vous venez accompagner quelqu'un ?",
 	},
 	{
 		id: 5,
 		output: "Renseignement",
-		text: "Renseignement",
+		text: "Renseignement / achat ou retrait de titre de transport ?",
 	},
 	{
 		id: 6,
 		output: "Achat",
-		text: "Achat",
+		text: "Achat presse / tabac / café",
 	},
 	{
 		id: 7,
 		output: "Travailler",
-		text: "Travailler",
+		text: "Vous travaillez dans la gare ?",
 	},
 	{
 		id: 8,
 		output: "Bus",
-		text: "Bus",
+		text: "Vous venez prendre un bus ou un car ?",
 	},
 	{
 		id: 9,
 		output: "Autre",
-		text: "Autre",
+		text: "Autre -> précisez :",
 	}
 ];
 
@@ -347,10 +362,13 @@ const origine = [
 
 
 const frequence = [
-	{ id: 1, output: 1, text: "tous les jours ou presque" },
-	{ id: 2, output: 2, text: "une à 2 fois par semaine" },
-	{ id: 3, output: 3, text: "3 à 4 fois par mois" },
-	{ id: 4, output: 4, text: "plus rarement" },
+	{ id: 1, output: "Ts les jrs", text: "Tous les jours de la semaine ou presque" },
+	{ id: 2, output: "1-2 / smn", text: "1 à 2 fois par semaine" },
+	{ id: 3, output: "Plrs / mois", text: "1 ou plusieurs fois par mois" },
+	{ id: 4, output: "-1 / mois", text: "Moins d'une fois par mois" },
+	{ id: 5, output: "Ts les ans", text: "Tous les ans" },
+	{ id: 6, output: "1ière", text: "C'est la première fois" },
+	{ id: 7, output: "Jamais", text: "Jamais" }
 ];
 
 export {
@@ -364,5 +382,7 @@ export {
 	motifDestination,
 	sexes,
 	usagers,
-	typeUsagers
+	typeUsagers,
+	parking
 };
+

@@ -1,9 +1,9 @@
 <script setup>
-import SurveyComponent from './components/SurveyComponent.vue'
+import Start from './components/Start.vue'
 </script>
 
 <template>
-  <SurveyComponent />
+  <Start />
 </template>
 
 <style >

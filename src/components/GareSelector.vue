@@ -1,11 +1,10 @@
 <template>
   <div class="form-group">
-    <input class="form-control" list="gareList" type="text" v-model="searchTerm" placeholder="Nom Gare"
-      @input="updateGare" />
-
-  <datalist id="gareList">
-    <option v-for="item in filteredGares" :key="item['Code UIC']" :value="item['Nom Gare']">{{ item['Nom Gare'] }}</option>
-  </datalist>
+    <input class="form-control" list="gareList" type="text" v-model="searchTerm" placeholder="Nom Gare" @input="updateGare" />
+    <datalist id="gareList">
+      <option v-for="item in filteredGares" :key="item['Code UIC']" :value="item['Nom Gare']">{{ item['Nom Gare'] }}
+      </option>
+    </datalist>
 
   </div>
 </template>

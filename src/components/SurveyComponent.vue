@@ -53,7 +53,7 @@
 
         <div v-if="reponse.typeUsager === 'Partant' && choice_nu === 1">
             <h1>QP1 - Quelle sera votre gare de destination? </h1>
-                <CommuneSelector v-model="reponse.gare" />
+                <GareSelector v-model="reponse.gare" />
             <button @click="next_nu" class="btn-submit">Done</button>
             <button @click="backSecondSet" class="btn-return">retour</button>
           </div>
@@ -92,7 +92,7 @@
 import { ref } from "vue";
 import { usagers, sexes, typeUsagers, frequence, parking } from "./reponses";
 import { db } from "../firebaseConfig";
-import CommuneSelector from './CommuneSelector.vue';
+import GareSelector from "./GareSelector.vue";
 import { collection, addDoc, getDocs } from "firebase/firestore";
 import * as XLSX from "xlsx";
 
@@ -195,7 +195,7 @@ const downloadData = async () => {
         Precision_Type_Usager: docData.Precision_Type_Usager || "",
         NU_Frequence: docData.NU_Frequence || "",
         NU_Usage_parking: docData.NU_Usage_parking || "",
-        P_Gare_Destination : docData.P_Gare_Destination || ""
+        P_Gare_Destination: docData.P_Gare_Destination || ""
       };
       data.push(mappedData);
     });

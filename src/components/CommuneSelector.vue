@@ -26,9 +26,16 @@ watch(searchTerm, (newValue) => {
 });
 
 const filteredGares = computed(() => {
-  return gares.filter(item => {
+  const searchLower = searchTerm.value.toLowerCase();
+  const uniqueGares = new Map();
+
+  for (const item of gares) {
     const nomGare = item['Nom Gare']?.toLowerCase() ?? '';
-    return nomGare.includes(searchTerm.value.toLowerCase());
-  });
+    if (nomGare.includes(searchLower)) {
+      uniqueGares.set(item['Nom Gare'], item);
+    }
+  }
+
+  return Array.from(uniqueGares.values());
 });
 </script>

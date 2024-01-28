@@ -361,7 +361,7 @@ const origine = [
 
 
 
-const frequence = [
+const nu_frequence = [
 	{ id: 1, output: "Ts les jrs", text: "Tous les jours de la semaine ou presque" },
 	{ id: 2, output: "1-2 / smn", text: "1 à 2 fois par semaine" },
 	{ id: 3, output: "Plrs / mois", text: "1 ou plusieurs fois par mois" },
@@ -371,18 +371,28 @@ const frequence = [
 	{ id: 7, output: "Jamais", text: "Jamais" }
 ];
 
+const frequence = [
+	{ id: 1, output: "Ts les jrs", text: "Tous les jours de la semaine ou presque" },
+	{ id: 2, output: "1-2 / smn", text: "1 à 2 fois par semaine" },
+	{ id: 3, output: "Plrs / mois", text: "1 ou plusieurs fois par mois" },
+	{ id: 4, output: "-1 / mois", text: "Moins d'une fois par mois" },
+	{ id: 5, output: "Ts les ans", text: "Tous les ans" },
+	{ id: 6, output: "1ière", text: "C'est la première fois" },
+];
+
 export {
 	plaques,
 	postes,
 	typeVehicule,
 	occupation,
 	origine,
-	frequence,
+	nu_frequence,
 	motifOrigine,
 	motifDestination,
 	sexes,
 	usagers,
 	typeUsagers,
-	parking
+	parking,
+	frequence
 };
 

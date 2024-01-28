@@ -10,86 +10,426 @@
 		</div>
 
 		<div v-if="level === 2" class="form-group">
-			<h1 v>Sexe de la personne interviewée</h1>
-			<select id="sexe" v-model="sex" class="form-control">
+			<h1>Sexe de la personne interviewée</h1>
+			<select v-model="SEXE" class="form-control">
 				<option v-for="option in sexes" :key="option.id" :value="option.output">
 					{{ option.text }}
 				</option>
 			</select>
-			<button v-if="sex" @click="next" class="btn-next">Suivant</button>
-			<button @click="back" class="btn-fin">retour</button>
+			<button v-if="SEXE" @click="next" class="btn-next">Suivant</button>
+			<button @click="back" class="btn-return">retour</button>
 		</div>
 
 		<div v-if="level === 3" class="form-group">
 			<h1>L'usager interviewé voyage en train ?</h1>
-			<select v-model="usager" class="form-control">
+			<select v-model="Usager_train" class="form-control">
 				<option v-for="option in usagers" :key="option.id" :value="option.output">
 					{{ option.text }}
 				</option>
 			</select>
-			<button v-if="usager" @click="next" class="btn-next">Suivant</button>
-			<button @click="back" class="btn-fin">retour</button>
+			<button v-if="Usager_train" @click="next" class="btn-next">Suivant</button>
+			<button @click="back" class="btn-return">retour</button>
 		</div>
 
-		<div v-if="usager === 'Usager' && level === 4">
+		<div v-if="Usager_train === 'Non-usager' && level === 4">
+			<h1>Néanmoins à quelle fréquence allez-vous en gare de Sens ?</h1>
+			<select v-model="NU_Frequence" class="form-control">
+				<option v-for="option in nu_frequence" :key="option.id" :value="option.output">
+					{{ option.text }}
+				</option>
+			</select>
+			<div v-if="NU_Frequence === '1ière' || NU_Frequence === 'Jamais'">
+				<button @click="submitSurvey" class="btn-fin">FINIR QUESTIONNAIRE</button>
+			</div>
+			<div
+				v-else-if="NU_Frequence === 'Ts les jrs' || NU_Frequence === '1-2 / smn' || NU_Frequence === 'Plrs / mois' || NU_Frequence === '-1 / mois' || NU_Frequence === 'Ts les ans'">
+				<h1>Lorsque vous allez en gare, utilisez-vous ce parking ?</h1>
+				<select v-model="NU_Usage_parking" class="form-control">
+					<option v-for="option in parking" :key="option.id" :value="option.output">
+						{{ option.text }}
+					</option>
+				</select>
+				<button @click="submitSurvey" class="btn-fin">FINIR QUESTIONNAIRE</button>
+			</div>
+			<button @click="back" class="btn-return">Retour</button>
+		</div>
+
+		<div v-if="Usager_train === 'Usager' && level === 4">
 			<h1>Par rapport à votre venue en gare :</h1>
-			<select id="QCo1" v-model="typeUsager" class="form-control">
+			<select v-model="Type_Usager" class="form-control">
 				<option v-for="option in typeUsagers" :key="option.id" :value="option.output">
 					{{ option.text }}
 				</option>
 			</select>
-			<input v-if="typeUsager === 'Autre'" class="form-control" type="text" v-model="precision_Type_Usager"
+			<input v-if="Type_Usager === 'Autre'" class="form-control" type="text" v-model="precision_Type_Usager"
 				placeholder="Precisions">
-			<button v-if="typeUsager" @click="next" class="btn-next">Done</button>
-			<button @click="back" class="btn-fin">retour</button>
+			<button v-if="Type_Usager" @click="next" class="btn-next">Suivant</button>
+			<button @click="back" class="btn-return">retour</button>
 		</div>
 
-		<div v-if="usager === 'Non-usager' && level === 4">
-			<h1>Fin du Questionnaire</h1>
-
-			<button @click="back" class="btn-fin">Finish</button>
+		<div v-if="Type_Usager === 'Partant' && level === 5">
+			<h1>Quelle sera votre gare de destination? </h1>
+			<GareSelector v-model="P_Gare_Destination" />
+			<input id="autre" class="form-control" type="text" v-model="P_Gare_Destination"
+				placeholder="Gare Internationale">
+			<button v-if="P_Gare_Destination" @click="next" class="btn-fin">Suivant</button>
+			<button @click="back" class="btn-return">retour</button>
 		</div>
-		<!-- <button @click="submitSurvey" class="btn-fin">FINIR QUESTIONNAIRE</button> -->
+
+		<div v-if="Type_Usager === 'Partant' && level === 6">
+			<h1>Combien de temps allez-vous rester stationner ?</h1>
+			<input id="autre" class="form-control" type="text" v-model="P_Detail_CV_temps" placeholder="Réponse ouverte">
+			<button v-if="P_Detail_CV_temps" @click="next" class="btn-next">Suivant</button>
+			<button @click="back" class="btn-return">retour</button>
+		</div>
+
+		<div v-if="Type_Usager === 'Arrivant' && level === 5">
+			<h1>Quelle est votre gare d'origine? </h1>
+			<GareSelector v-model="A_Gare_Origine" />
+			<input id="autre" class="form-control" type="text" v-model="A_Gare_Origine"
+				placeholder="Gare Internationale">
+			<button v-if="A_Gare_Origine" @click="next" class="btn-fin">Suivant</button>
+			<button @click="back" class="btn-return">retour</button>
+		</div>
+
+		<div v-if="Type_Usager === 'Arrivant' && level === 6">
+			<h1>Combien de temps etes-vous rester stationner ?</h1>
+			<input id="autre" class="form-control" type="text" v-model="A_Detail_VC_temps" placeholder="Réponse ouverte">
+			<button v-if="A_Detail_VC_temps" @click="next" class="btn-next">Suivant</button>
+			<button @click="back" class="btn-return">retour</button>
+		</div>
+
+		<div
+			v-if="level === 7 || level === 5 && Type_Usager === 'Attendre' || level === 5 && Type_Usager === 'Accompagner'
+				|| level === 5 && Type_Usager === 'Renseignement' || level === 5 && Type_Usager === 'Achat'
+				|| level === 5 && Type_Usager === 'Travailler' || level === 5 && Type_Usager === 'Bus' || level === 5 && Type_Usager === 'Autre'">
+			<h1>A quelle fréquence venez-vous dans cette gare?</h1>
+			<select v-model="Frequence" class="form-control">
+				<option v-for="option in frequence" :key="option.id" :value="option.output">
+					{{ option.text }}
+				</option>
+			</select>
+			<button v-if="Frequence" @click="next" class="btn-next">Suivant</button>
+			<button @click="back" class="btn-return">retour</button>
+		</div>
+		<div
+			v-if="level === 8 || level === 6 && Type_Usager === 'Attendre' || level === 6 && Type_Usager === 'Accompagner'
+				|| level === 6 && Type_Usager === 'Renseignement' || level === 6 && Type_Usager === 'Achat'
+				|| level === 6 && Type_Usager === 'Travailler' || level === 6 && Type_Usager === 'Bus' || level === 6 && Type_Usager === 'Autre'">
+			<h1>Quelle est votre commune de résidence ?</h1>
+			<CommuneSelector v-model="Commune_residence" />
+			<button v-if="Frequence" @click="submitSurvey" class="btn-next">Suivant</button>
+			<button @click="back" class="btn-return">retour</button>
+		</div>
+		<button @click="downloadData">download DATA</button>
 	</div>
 </template>
 
 <script setup>
 import { ref } from "vue";
-import { sexes, usagers, typeUsagers } from "./reponses";
-//  frequence, parking
+import { sexes, usagers, typeUsagers, nu_frequence, frequence, parking } from "./reponses";
+import GareSelector from "./GareSelector.vue";
+import CommuneSelector from './CommuneSelector.vue';
+import { db } from "../firebaseConfig";
+import { collection, addDoc, getDocs } from "firebase/firestore";
+import * as XLSX from "xlsx";
 
+const surveyCollectionRef = collection(db, "Sens");
 const level = ref(0);
 const startDate = ref('');
 const enqueteur = ref('');
-const sex = ref('');
-const usager = ref('');
-const typeUsager = ref('');
-const precision_Type_Usager = ref('')
+const SEXE = ref('');
+const Usager_train = ref('');
+const Type_Usager = ref('');
+const NU_Frequence = ref('');
+const NU_Usage_parking = ref('');
+const precision_Type_Usager = ref('');
+const P_Gare_Destination = ref('');
+const P_Detail_CV_temps = ref('');
+const A_Gare_Origine = ref('');
+const A_Detail_VC_temps = ref('');
+const Frequence = ref('');
+const Commune_residence = ref('');
+
 
 const startSurvey = () => {
 	startDate.value = new Date().toLocaleTimeString("fr-FR").slice(0, 8);
 	level.value++;
-	console.log(startDate.value)
 }
 
 const next = () => {
 	level.value++;
-	console.log("Level: " + level.value + " " + "Enqueteur: " + enqueteur.value + " " + "sex: " + sex.value + " " + "usager: " + usager.value)
+	console.log(level.value)
+
 }
 
 const back = () => {
 	level.value--;
 }
 
-const submitSurvey = () => {
-	startDate.value = '';
-	const HEURE_FIN = new Date().toLocaleTimeString("fr-FR").slice(0, 8);
-	const DATE = new Date().toLocaleDateString("fr-FR").replace(/\//g, "-");
-	const JOUR = new Date().toLocaleDateString("fr-FR", { weekday: 'long' });
-	console.log(DATE + " " + JOUR + " " + HEURE_FIN);
-	level.value--
+const submitSurvey = async () => {
+	level.value = 0;
+	await addDoc(surveyCollectionRef, {
+		HEURE_DEBUT: startDate.value,
+		SEXE: SEXE.value,
+		DATE: new Date().toLocaleDateString("fr-FR").replace(/\//g, "-"),
+		JOUR: new Date().toLocaleDateString("fr-FR", { weekday: 'long' }),
+		ENQUETEUR: enqueteur.value,
+		HEURE_FIN: new Date().toLocaleTimeString("fr-FR").slice(0, 8),
+		Usager_train: Usager_train.value,
+		Type_Usager: Type_Usager.value,
+		Precision_Type_Usager: precision_Type_Usager.value,
+		NU_Frequence: NU_Frequence.value,
+		NU_Usage_parking: NU_Usage_parking.value,
+		P_Gare_Destination: P_Gare_Destination.value,
+		P_Detail_CV_temps: P_Detail_CV_temps.value,
+		A_Detail_VC_temps: A_Detail_VC_temps.value,
+		A_Gare_Origine: A_Gare_Origine.value,
+		Frequence : Frequence.value,
+		Commune_residence: Commune_residence.value,
+	});
+	startDate.value = "";
+	enqueteur.value = "";
+	SEXE.value = "";
+	Usager_train.value = "";
+	Type_Usager.value = "";
+	NU_Frequence.value = "";
+	NU_Usage_parking.value = "";
+	precision_Type_Usager.value = "";
+	P_Gare_Destination.value = "";
+	P_Detail_CV_temps.value = "";
+	A_Gare_Origine.value = "";
+	A_Detail_VC_temps.value = "";
+	Frequence.value = "";
+	Commune_residence.value = "";
 };
 
+const downloadData = async () => {
+	try {
+		const querySnapshot = await getDocs(surveyCollectionRef);
+		let data = [];
+		let maxWidths = {}; // Object to keep track of maximum width for each column
+
+		// Define your headers
+		const headers = {
+			HEURE: "HEURE",
+			SEXE: "SEXE",
+			DATE: "DATE",
+			JOUR: "JOUR",
+			ID_questionnaire: "ID_questionnaire",
+			Enqueteur: "Enqueteur",
+			HEURE_FIN: "HEURE_FIN",
+			Usager_train: "Usager_train",
+			Type_Usager: "Type_Usager",
+			Precision_Type_Usager: "Precision_Type_Usager",
+			P_Gare_Destination: "P_Gare_Destination",
+			P_Detail_CV_temps: "P_Detail_CV_temps",
+			A_Gare_Origine: "A_Gare_Origine",
+			A_Detail_VC_temps: "A_Detail_VC_temps",
+			Frequence: "Frequence",
+			NU_Frequence: "NU_Frequence",
+			NU_Usage_parking: "NU_Usage_parking",
+			Commune_residence: "Commune_residence",
+		};
+
+		// Initialize maxWidths with header lengths
+		Object.keys(headers).forEach((key) => {
+			maxWidths[key] = headers[key].length;
+		});
+
+		querySnapshot.forEach((doc) => {
+			let docData = doc.data();
+				let mappedData = {
+								HEURE: docData.HEURE_DEBUT || "",
+								SEXE: docData.SEXE || "",
+								DATE: docData.DATE || "",
+								JOUR: docData.JOUR || "",
+								ID_questionnaire: doc.id,
+								Enqueteur: docData.ENQUETEUR || "",
+								HEURE_FIN: docData.HEURE_FIN || "",
+								Usager_train: docData.Usager_train || "",
+								Type_Usager: docData.Type_Usager || "",
+								Precision_Type_Usager: docData.Precision_Type_Usager || "",
+								P_Gare_Destination: docData.P_Gare_Destination || "",
+								P_Detail_CV_temps: docData.P_Detail_CV_temps || "",
+								A_Gare_Origine: docData.A_Gare_Origine || "",
+								A_Detail_VC_temps: docData.A_Detail_VC_temps || "",
+								Frequence: docData.Frequence || "",
+								NU_Frequence: docData.NU_Frequence || "",
+								NU_Usage_parking: docData.NU_Usage_parking || "",
+								Commune_residence: docData.Commune_residence || "",
+							};
+			data.push(mappedData);
+
+			// Update maxWidths for each key in mappedData
+			Object.keys(mappedData).forEach((key) => {
+				const valueLength = mappedData[key].toString().length;
+				maxWidths[key] = Math.max(maxWidths[key], valueLength);
+			});
+		});
+
+		// Convert data to a worksheet
+		const worksheet = XLSX.utils.json_to_sheet(data, {
+			header: Object.keys(headers),
+			skipHeader: false,
+		});
+
+		// Set the widths for each column
+		worksheet["!cols"] = Object.keys(maxWidths).map((key) => ({
+			wch: maxWidths[key] + 2 // +2 for a little extra padding
+		}));
+
+		const workbook = XLSX.utils.book_new();
+		XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
+
+		// Export the workbook to a .xlsx file
+		XLSX.writeFile(workbook, "OdCaen.xlsx");
+	} catch (error) {
+		console.error("Error downloading data: ", error);
+	}
+};
+
+
+// const downloadData = async () => {
+// 	try {
+// 		const querySnapshot = await getDocs(surveyCollectionRef);
+// 		let data = [];
+// 		let maxWidths = {}; // Object to keep track of maximum width for each column
+
+// 		querySnapshot.forEach((doc) => {
+// 			let docData = doc.data();
+// 			let mappedData = {
+// 				HEURE: docData.HEURE_DEBUT || "",
+// 				SEXE: docData.SEXE || "",
+// 				DATE: docData.DATE || "",
+// 				JOUR: docData.JOUR || "",
+// 				ID_questionnaire: doc.id,
+// 				Enqueteur: docData.ENQUETEUR || "",
+// 				HEURE_FIN: docData.HEURE_FIN || "",
+// 				Usager_train: docData.Usager_train || "",
+// 				Type_Usager: docData.Type_Usager || "",
+// 				Precision_Type_Usager: docData.Precision_Type_Usager || "",
+// 				P_Gare_Destination: docData.P_Gare_Destination || "",
+// 				P_Detail_CV_temps: docData.P_Detail_CV_temps || "",
+// 				A_Gare_Origine: docData.A_Gare_Origine || "",
+// 				A_Detail_VC_temps: docData.A_Detail_VC_temps || "",
+// 				Frequence: docData.Frequence || "",
+// 				NU_Frequence: docData.NU_Frequence || "",
+// 				NU_Usage_parking: docData.NU_Usage_parking || "",
+// 				Commune_residence: docData.Commune_residence || "",
+// 			};
+// 			data.push(mappedData);
+
+// 			// Update maxWidths for each key in mappedData
+// 			Object.keys(mappedData).forEach((key) => {
+// 				const valueLength = mappedData[key].toString().length;
+// 				maxWidths[key] = Math.max(maxWidths[key] || 0, valueLength);
+// 			});
+// 		});
+
+// 		// Convert data to a worksheet
+// 		const worksheet = XLSX.utils.json_to_sheet(data, {
+// 			header: Object.keys(data[0]),
+// 			skipHeader: false,
+// 		});
+
+// 		// Set the widths for each column
+// 		worksheet["!cols"] = Object.keys(maxWidths).map((key) => ({
+// 			wch: maxWidths[key] + 2 // +2 for a little extra padding
+// 		}));
+
+// 		const workbook = XLSX.utils.book_new();
+// 		XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
+
+// 		// Export the workbook to a .xlsx file
+// 		XLSX.writeFile(workbook, "OdCaen.xlsx");
+// 	} catch (error) {
+// 		console.error("Error downloading data: ", error);
+// 	}
+// };
+
+
+
+// const downloadData = async () => {
+// 	try {
+// 		const querySnapshot = await getDocs(surveyCollectionRef);
+// 		let data = [];
+// 		let maxWidths = {}; // Object to keep track of maximum width for each column
+
+// 		querySnapshot.forEach((doc) => {
+// 			let docData = doc.data();
+// 			let mappedData = {
+// 				HEURE: docData.HEURE_DEBUT || "",
+// 				SEXE: docData.SEXE || "", // Sexe
+// 				DATE: docData.DATE || "", // Date
+// 				JOUR: docData.JOUR || "",
+// 				ID_questionnaire: doc.id, // Firebase document ID
+// 				Enqueteur: docData.ENQUETEUR || "", // Name
+// 				HEURE_FIN: docData.HEURE_FIN || "", // Heure
+// 				Usager_train: docData.Usager_train || "", // Plaque
+// 				Type_Usager: docData.Type_Usager || "", // Type
+// 				Precision_Type_Usager: docData.Precision_Type_Usager || "",
+// 				P_Gare_Destination: docData.P_Gare_Destination || "", 
+// 				P_Detail_CV_temps: docData.P_Detail_CV_temps || "", 
+// 				A_Gare_Origine: docData.A_Gare_Origine || "", 
+// 				A_Detail_VC_temps: docData.A_Detail_VC_temps || "", 
+// 				Frequence: docData.Frequence || "", 
+// 				NU_Frequence: docData.NU_Frequence || "",
+// 				NU_Usage_parking: docData.NU_Usage_parking || "",
+// 				Commune_residence: docData.Commune_residence || "", 
+// 			};
+// 			data.push(mappedData);
+// 		});
+
+// 		// Calculate the maximum width for each column, considering the minimum width
+// 		// Adjust this factor as needed for padding or wider characters
+// 		const scalingFactor = 2; // Increased scaling factor for better visibility
+// 		Object.keys(data[0]).forEach((key) => {
+// 			let maxLen = Math.max(
+// 				...data.map((item) => item[key].toString().length),
+// 				minWidth
+// 			);
+// 			maxWidths[key] = Math.ceil(maxLen * scalingFactor); // Apply scaling factor and round up
+// 		});
+
+// 		// Convert data to a worksheet
+// 		const worksheet = XLSX.utils.json_to_sheet(data, {
+// 			header: [
+// 				"ID_questionnaire",
+// 				"DATE",
+// 				"JOUR",
+// 				"HEURE",
+// 				"HEURE_FIN",
+// 				"SEXE",
+// 				"Usager_train",
+// 				"Type_Usager",
+// 				"Precision_Type_Usager",
+// 				"NU_Frequence",
+// 				"NU_Usage_parking",
+// 				"Frequence",
+// 				"Commune_residence",
+// 				"P_Gare_Destination",
+// 				"P_Detail_CV_temps",
+// 				"A_Gare_Origine",
+// 				"A_Detail_VC_temps"
+// 			],
+// 			skipHeader: false,
+// 		});
+
+// 		// Set the widths for each column, ensuring a minimum width
+// 		worksheet["!cols"] = Object.keys(maxWidths).map((key) => ({
+// 			wch: maxWidths[key],
+// 		}));
+
+// 		const workbook = XLSX.utils.book_new();
+
+// 		XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
+// 		// Export the workbook to a .xlsx file
+// 		XLSX.writeFile(workbook, "OdCaen.xlsx");
+// 	} catch (error) {
+// 		console.error("Error downloading data: ", error);
+// 	}
+// };
 
 </script>
 
@@ -129,14 +469,14 @@ body {
 }
 
 .btn-return {
+	width: 100%;
 	background-color: #898989;
 	color: white;
-	padding: 10px 20px;
-	margin-top: 1.5%;
+	padding: 20px 20px;
+	margin-top: 20%;
 	border: none;
 	border-radius: 5px;
 	cursor: pointer;
-	width: 100%;
 }
 
 .btn-return:hover {

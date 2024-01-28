@@ -11,7 +11,7 @@
 
 <script setup>
 import { ref, watch, computed } from 'vue';
-import gares from './output.json';
+import gares from './gare.json';
 
 const props = defineProps({
   modelValue: String

@@ -52,11 +52,11 @@
         </div>
 
         <div v-if="reponse.typeUsager === 'Partant' && choice_nu === 1">
-            <h1>QP1 - Quelle sera votre gare de destination? </h1>
-                <GareSelector v-model="reponse.gare" />
-            <button @click="next_nu" class="btn-submit">Done</button>
-            <button @click="backSecondSet" class="btn-return">retour</button>
-          </div>
+          <h1>QP1 - Quelle sera votre gare de destination? </h1>
+          <GareSelector v-model="reponse.gare" />
+          <button @click="next_nu" class="btn-submit">Done</button>
+          <button @click="backSecondSet" class="btn-return">retour</button>
+        </div>
 
         <div v-else-if="reponse.usager === 'Non-usager'">
           <h1>QNU2 - Néanmoins à quelle fréquence allez-vous en gare de Sens ?</h1>

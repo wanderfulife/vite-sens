@@ -38,7 +38,7 @@ const updateCommune = (newValue) => {
 };
 
 const selectCommune = (item) => {
-  emit('update:modelValue', `${item.COMMUNE} - ${item.DEPARTEMENT}`);
+  emit('update:modelValue', `${item.COMMUNE} - ${item['CODE INSEE']}`);
   showDropdown.value = false;
 };
 

@@ -86,8 +86,7 @@
 		<div v-if="Type_Usager === 'Arrivant' && level === 5">
 			<h1>Quelle est votre gare d'origine? </h1>
 			<GareSelector v-model="A_Gare_Origine" />
-			<input id="autre" class="form-control" type="text" v-model="A_Gare_Origine"
-				placeholder="Gare Internationale">
+			<input id="autre" class="form-control" type="text" v-model="A_Gare_Origine" placeholder="Gare Internationale">
 			<button v-if="A_Gare_Origine" @click="next" class="btn-fin">Suivant</button>
 			<button @click="back" class="btn-return">retour</button>
 		</div>
@@ -121,8 +120,8 @@
 			<button v-if="Frequence" @click="submitSurvey" class="btn-next">Suivant</button>
 			<button @click="back" class="btn-return">retour</button>
 		</div>
-		<button @click="downloadData">download DATA</button>
 	</div>
+	<button class="btn-fin" @click="downloadData">download DATA</button>
 </template>
 
 <script setup>
@@ -185,7 +184,7 @@ const submitSurvey = async () => {
 		P_Detail_CV_temps: P_Detail_CV_temps.value,
 		A_Detail_VC_temps: A_Detail_VC_temps.value,
 		A_Gare_Origine: A_Gare_Origine.value,
-		Frequence : Frequence.value,
+		Frequence: Frequence.value,
 		Commune_residence: Commune_residence.value,
 	});
 	startDate.value = "";
@@ -212,24 +211,24 @@ const downloadData = async () => {
 
 		// Define your headers
 		const headers = {
-			HEURE: "HEURE",
-			SEXE: "SEXE",
-			DATE: "DATE",
-			JOUR: "JOUR",
 			ID_questionnaire: "ID_questionnaire",
 			Enqueteur: "Enqueteur",
+			DATE: "DATE",
+			JOUR: "JOUR",
+			HEURE: "HEURE",
 			HEURE_FIN: "HEURE_FIN",
+			SEXE: "SEXE",
 			Usager_train: "Usager_train",
 			Type_Usager: "Type_Usager",
 			Precision_Type_Usager: "Precision_Type_Usager",
+			NU_Frequence: "NU_Frequence",
+			NU_Usage_parking: "NU_Usage_parking",
+			Frequence: "Frequence",
+			Commune_residence: "Commune_residence",
 			P_Gare_Destination: "P_Gare_Destination",
 			P_Detail_CV_temps: "P_Detail_CV_temps",
 			A_Gare_Origine: "A_Gare_Origine",
 			A_Detail_VC_temps: "A_Detail_VC_temps",
-			Frequence: "Frequence",
-			NU_Frequence: "NU_Frequence",
-			NU_Usage_parking: "NU_Usage_parking",
-			Commune_residence: "Commune_residence",
 		};
 
 		// Initialize maxWidths with header lengths
@@ -239,26 +238,26 @@ const downloadData = async () => {
 
 		querySnapshot.forEach((doc) => {
 			let docData = doc.data();
-				let mappedData = {
-								HEURE: docData.HEURE_DEBUT || "",
-								SEXE: docData.SEXE || "",
-								DATE: docData.DATE || "",
-								JOUR: docData.JOUR || "",
-								ID_questionnaire: doc.id,
-								Enqueteur: docData.ENQUETEUR || "",
-								HEURE_FIN: docData.HEURE_FIN || "",
-								Usager_train: docData.Usager_train || "",
-								Type_Usager: docData.Type_Usager || "",
-								Precision_Type_Usager: docData.Precision_Type_Usager || "",
-								P_Gare_Destination: docData.P_Gare_Destination || "",
-								P_Detail_CV_temps: docData.P_Detail_CV_temps || "",
-								A_Gare_Origine: docData.A_Gare_Origine || "",
-								A_Detail_VC_temps: docData.A_Detail_VC_temps || "",
-								Frequence: docData.Frequence || "",
-								NU_Frequence: docData.NU_Frequence || "",
-								NU_Usage_parking: docData.NU_Usage_parking || "",
-								Commune_residence: docData.Commune_residence || "",
-							};
+			let mappedData = {
+				ID_questionnaire: doc.id,
+				Enqueteur: docData.ENQUETEUR || "",
+				DATE: docData.DATE || "",
+				JOUR: docData.JOUR || "",
+				HEURE: docData.HEURE_DEBUT || "",
+				HEURE_FIN: docData.HEURE_FIN || "",
+				SEXE: docData.SEXE || "",
+				Usager_train: docData.Usager_train || "",
+				Type_Usager: docData.Type_Usager || "",
+				Precision_Type_Usager: docData.Precision_Type_Usager || "",
+				NU_Frequence: docData.NU_Frequence || "",
+				NU_Usage_parking: docData.NU_Usage_parking || "",
+				Frequence: docData.Frequence || "",
+				Commune_residence: docData.Commune_residence || "",
+				P_Gare_Destination: docData.P_Gare_Destination || "",
+				P_Detail_CV_temps: docData.P_Detail_CV_temps || "",
+				A_Gare_Origine: docData.A_Gare_Origine || "",
+				A_Detail_VC_temps: docData.A_Detail_VC_temps || "",
+			};
 			data.push(mappedData);
 
 			// Update maxWidths for each key in mappedData
@@ -283,153 +282,11 @@ const downloadData = async () => {
 		XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
 
 		// Export the workbook to a .xlsx file
-		XLSX.writeFile(workbook, "OdCaen.xlsx");
+		XLSX.writeFile(workbook, "OdSens.xlsx");
 	} catch (error) {
 		console.error("Error downloading data: ", error);
 	}
 };
-
-
-// const downloadData = async () => {
-// 	try {
-// 		const querySnapshot = await getDocs(surveyCollectionRef);
-// 		let data = [];
-// 		let maxWidths = {}; // Object to keep track of maximum width for each column
-
-// 		querySnapshot.forEach((doc) => {
-// 			let docData = doc.data();
-// 			let mappedData = {
-// 				HEURE: docData.HEURE_DEBUT || "",
-// 				SEXE: docData.SEXE || "",
-// 				DATE: docData.DATE || "",
-// 				JOUR: docData.JOUR || "",
-// 				ID_questionnaire: doc.id,
-// 				Enqueteur: docData.ENQUETEUR || "",
-// 				HEURE_FIN: docData.HEURE_FIN || "",
-// 				Usager_train: docData.Usager_train || "",
-// 				Type_Usager: docData.Type_Usager || "",
-// 				Precision_Type_Usager: docData.Precision_Type_Usager || "",
-// 				P_Gare_Destination: docData.P_Gare_Destination || "",
-// 				P_Detail_CV_temps: docData.P_Detail_CV_temps || "",
-// 				A_Gare_Origine: docData.A_Gare_Origine || "",
-// 				A_Detail_VC_temps: docData.A_Detail_VC_temps || "",
-// 				Frequence: docData.Frequence || "",
-// 				NU_Frequence: docData.NU_Frequence || "",
-// 				NU_Usage_parking: docData.NU_Usage_parking || "",
-// 				Commune_residence: docData.Commune_residence || "",
-// 			};
-// 			data.push(mappedData);
-
-// 			// Update maxWidths for each key in mappedData
-// 			Object.keys(mappedData).forEach((key) => {
-// 				const valueLength = mappedData[key].toString().length;
-// 				maxWidths[key] = Math.max(maxWidths[key] || 0, valueLength);
-// 			});
-// 		});
-
-// 		// Convert data to a worksheet
-// 		const worksheet = XLSX.utils.json_to_sheet(data, {
-// 			header: Object.keys(data[0]),
-// 			skipHeader: false,
-// 		});
-
-// 		// Set the widths for each column
-// 		worksheet["!cols"] = Object.keys(maxWidths).map((key) => ({
-// 			wch: maxWidths[key] + 2 // +2 for a little extra padding
-// 		}));
-
-// 		const workbook = XLSX.utils.book_new();
-// 		XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
-
-// 		// Export the workbook to a .xlsx file
-// 		XLSX.writeFile(workbook, "OdCaen.xlsx");
-// 	} catch (error) {
-// 		console.error("Error downloading data: ", error);
-// 	}
-// };
-
-
-
-// const downloadData = async () => {
-// 	try {
-// 		const querySnapshot = await getDocs(surveyCollectionRef);
-// 		let data = [];
-// 		let maxWidths = {}; // Object to keep track of maximum width for each column
-
-// 		querySnapshot.forEach((doc) => {
-// 			let docData = doc.data();
-// 			let mappedData = {
-// 				HEURE: docData.HEURE_DEBUT || "",
-// 				SEXE: docData.SEXE || "", // Sexe
-// 				DATE: docData.DATE || "", // Date
-// 				JOUR: docData.JOUR || "",
-// 				ID_questionnaire: doc.id, // Firebase document ID
-// 				Enqueteur: docData.ENQUETEUR || "", // Name
-// 				HEURE_FIN: docData.HEURE_FIN || "", // Heure
-// 				Usager_train: docData.Usager_train || "", // Plaque
-// 				Type_Usager: docData.Type_Usager || "", // Type
-// 				Precision_Type_Usager: docData.Precision_Type_Usager || "",
-// 				P_Gare_Destination: docData.P_Gare_Destination || "", 
-// 				P_Detail_CV_temps: docData.P_Detail_CV_temps || "", 
-// 				A_Gare_Origine: docData.A_Gare_Origine || "", 
-// 				A_Detail_VC_temps: docData.A_Detail_VC_temps || "", 
-// 				Frequence: docData.Frequence || "", 
-// 				NU_Frequence: docData.NU_Frequence || "",
-// 				NU_Usage_parking: docData.NU_Usage_parking || "",
-// 				Commune_residence: docData.Commune_residence || "", 
-// 			};
-// 			data.push(mappedData);
-// 		});
-
-// 		// Calculate the maximum width for each column, considering the minimum width
-// 		// Adjust this factor as needed for padding or wider characters
-// 		const scalingFactor = 2; // Increased scaling factor for better visibility
-// 		Object.keys(data[0]).forEach((key) => {
-// 			let maxLen = Math.max(
-// 				...data.map((item) => item[key].toString().length),
-// 				minWidth
-// 			);
-// 			maxWidths[key] = Math.ceil(maxLen * scalingFactor); // Apply scaling factor and round up
-// 		});
-
-// 		// Convert data to a worksheet
-// 		const worksheet = XLSX.utils.json_to_sheet(data, {
-// 			header: [
-// 				"ID_questionnaire",
-// 				"DATE",
-// 				"JOUR",
-// 				"HEURE",
-// 				"HEURE_FIN",
-// 				"SEXE",
-// 				"Usager_train",
-// 				"Type_Usager",
-// 				"Precision_Type_Usager",
-// 				"NU_Frequence",
-// 				"NU_Usage_parking",
-// 				"Frequence",
-// 				"Commune_residence",
-// 				"P_Gare_Destination",
-// 				"P_Detail_CV_temps",
-// 				"A_Gare_Origine",
-// 				"A_Detail_VC_temps"
-// 			],
-// 			skipHeader: false,
-// 		});
-
-// 		// Set the widths for each column, ensuring a minimum width
-// 		worksheet["!cols"] = Object.keys(maxWidths).map((key) => ({
-// 			wch: maxWidths[key],
-// 		}));
-
-// 		const workbook = XLSX.utils.book_new();
-
-// 		XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
-// 		// Export the workbook to a .xlsx file
-// 		XLSX.writeFile(workbook, "OdCaen.xlsx");
-// 	} catch (error) {
-// 		console.error("Error downloading data: ", error);
-// 	}
-// };
 
 </script>
 

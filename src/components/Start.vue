@@ -1,12 +1,13 @@
 <template>
 	<div class="container">
 		<div v-if="level === 0">
-			<button @click="startSurvey" class="btn-next">COMMENCER QUESTIONNAIRE</button>
+			<h2>Prénom enqueteur :</h2>
+			<input class="form-control" type="text" v-model="enqueteur" />
+			<button v-if="enqueteur" @click="next" class="btn-next">Suivant</button>
 		</div>
 
 		<div v-if="level === 1">
-			<input class="form-control" type="text" v-model="enqueteur" placeholder="Prenom enqueteur" />
-			<button v-if="enqueteur" @click="next" class="btn-next">Suivant</button>
+			<button @click="startSurvey" class="btn-next">COMMENCER QUESTIONNAIRE</button>
 		</div>
 
 		<div v-if="level === 2" class="form-group">
@@ -72,7 +73,7 @@
 			<GareSelector v-model="P_Gare_Destination" />
 			<input id="autre" class="form-control" type="text" v-model="P_Gare_Destination"
 				placeholder="Gare Internationale">
-			<button v-if="P_Gare_Destination" @click="next" class="btn-fin">Suivant</button>
+			<button v-if="P_Gare_Destination" @click="next" class="btn-next">Suivant</button>
 			<button @click="back" class="btn-return">retour</button>
 		</div>
 
@@ -120,8 +121,9 @@
 			<button v-if="Frequence" @click="submitSurvey" class="btn-next">Suivant</button>
 			<button @click="back" class="btn-return">retour</button>
 		</div>
+		<img class="logo" src="../assets/Alycelogo.webp" alt="Logo Alyce">
+		<button class="btn-fin" @click="downloadData">download DATA</button>
 	</div>
-	<button class="btn-fin" @click="downloadData">download DATA</button>
 </template>
 
 <script setup>
@@ -130,10 +132,11 @@ import { sexes, usagers, typeUsagers, nu_frequence, frequence, parking } from ".
 import GareSelector from "./GareSelector.vue";
 import CommuneSelector from './CommuneSelector.vue';
 import { db } from "../firebaseConfig";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, updateDoc, addDoc } from "firebase/firestore";
 import * as XLSX from "xlsx";
 
 const surveyCollectionRef = collection(db, "Sens");
+const surveyNumber = ref(0); // collect onMount\
 const level = ref(0);
 const startDate = ref('');
 const enqueteur = ref('');
@@ -156,6 +159,7 @@ const startSurvey = () => {
 	level.value++;
 }
 
+
 const next = () => {
 	level.value++;
 	console.log(level.value)
@@ -166,10 +170,33 @@ const back = () => {
 	level.value--;
 }
 
+const fetchSurveyNumber = async () => {
+	const surveyRef = doc(db, "enquete-sens", "enquete");
+	const docSnap = await getDoc(surveyRef);
+	if (docSnap.exists() && docSnap.data().numero !== undefined) {
+		surveyNumber.value = docSnap.data().numero;
+		console.log(surveyNumber.value)
+	} else {
+		console.log("No such document or 'numero' field is missing!");
+	}
+};
+
+// Function to increment and update the survey number in Firebase
+const updateSurveyNumber = async () => {
+	const newNumber = surveyNumber.value + 1; // Increment the survey number
+	const surveyRef = doc(db, "enquete-sens", "enquete");
+	await updateDoc(surveyRef, {
+		numero: newNumber
+	});
+	surveyNumber.value = newNumber; // Update the local ref
+};
+
 const submitSurvey = async () => {
-	level.value = 0;
+	level.value = 1;
+	await fetchSurveyNumber()
 	await addDoc(surveyCollectionRef, {
 		HEURE_DEBUT: startDate.value,
+		ID_ENQUETE: surveyNumber.value,
 		SEXE: SEXE.value,
 		DATE: new Date().toLocaleDateString("fr-FR").replace(/\//g, "-"),
 		JOUR: new Date().toLocaleDateString("fr-FR", { weekday: 'long' }),
@@ -188,7 +215,6 @@ const submitSurvey = async () => {
 		Commune_residence: Commune_residence.value,
 	});
 	startDate.value = "";
-	enqueteur.value = "";
 	SEXE.value = "";
 	Usager_train.value = "";
 	Type_Usager.value = "";
@@ -201,6 +227,7 @@ const submitSurvey = async () => {
 	A_Detail_VC_temps.value = "";
 	Frequence.value = "";
 	Commune_residence.value = "";
+	await updateSurveyNumber()
 };
 
 const downloadData = async () => {
@@ -212,6 +239,7 @@ const downloadData = async () => {
 		// Define your headers
 		const headers = {
 			ID_questionnaire: "ID_questionnaire",
+			ID_ENQUETE: "ID_ENQUETE",
 			Enqueteur: "Enqueteur",
 			DATE: "DATE",
 			JOUR: "JOUR",
@@ -240,6 +268,7 @@ const downloadData = async () => {
 			let docData = doc.data();
 			let mappedData = {
 				ID_questionnaire: doc.id,
+				ID_ENQUETE: docData.ID_ENQUETE || "",
 				Enqueteur: docData.ENQUETEUR || "",
 				DATE: docData.DATE || "",
 				JOUR: docData.JOUR || "",
@@ -289,8 +318,116 @@ const downloadData = async () => {
 };
 
 </script>
-
 <style>
+body {
+	background-color: #2a3b63;
+}
+
+.logo {
+	padding: 10%;
+	height: 3em;
+}
+
+h1 {
+	text-align: center;
+	color: #4caf50;
+}
+
+h2 {
+	color: white;
+}
+
+.container {
+	background-color: #2a3b63;
+	color: white;
+	padding: 5% 0;
+	width: 75%;
+	margin: auto;
+}
+
+.btn-next {
+	width: 100%;
+	background-color: green;
+	color: white;
+	padding: 20px 20px;
+	margin-top: 20%;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.btn-fin {
+	width: 100%;
+	background-color: #4c4faf;
+	color: white;
+	padding: 20px 20px;
+	margin-top: 5%;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.btn-return {
+	width: 100%;
+	background-color: #898989;
+	color: white;
+	padding: 20px 20px;
+	margin-top: 5%;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+.btn-return:hover {
+	background-color: #839684;
+}
+
+.commune-dropdown {
+	/* Style your dropdown list here */
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	max-height: 200px;
+	overflow-y: auto;
+}
+
+.form-control {
+	width: 100%;
+	border-radius: 5px;
+	border: 1px solid white;
+	background-color: #333;
+	color: white;
+	text-transform: uppercase;
+	font-weight: bolder;
+}
+
+input.form-control {
+	width: 93%;
+}
+
+.commune-dropdown li {
+	padding: 5px 10px;
+	cursor: pointer;
+}
+
+*:focus {
+	outline: none;
+}
+
+.commune-dropdown li:hover {
+	background-color: #f0f0f0;
+}
+
+input,
+select,
+button {
+	font-size: 16px;
+	padding: 10px;
+}
+</style>
+<!-- <style>
 body {
 	background-color: #1e1e1e;
 }
@@ -408,4 +545,4 @@ button {
 	font-size: 16px;
 	padding: 10px;
 }
-</style>
+</style> -->

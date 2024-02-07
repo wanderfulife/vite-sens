@@ -118,7 +118,7 @@
 				|| level === 6 && Type_Usager === 'Travailler' || level === 6 && Type_Usager === 'Bus' || level === 6 && Type_Usager === 'Autre'">
 			<h1>Quelle est votre commune de résidence ?</h1>
 			<CommuneSelector v-model="Commune_residence" />
-			<button v-if="Frequence" @click="submitSurvey" class="btn-next">Suivant</button>
+			<button v-if="Frequence" @click="submitSurvey" class="btn-next">FINIR QUESTIONNAIRE</button>
 			<button @click="back" class="btn-return">retour</button>
 		</div>
 		<img class="logo" src="../assets/Alycelogo.webp" alt="Logo Alyce">

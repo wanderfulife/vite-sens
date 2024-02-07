@@ -2,13 +2,13 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBC5bPRH9RFUjDZjapcVVX_qWmKxIQ40fA",
-  authDomain: "bethune-43390.firebaseapp.com",
-  projectId: "bethune-43390",
-  storageBucket: "bethune-43390.appspot.com",
-  messagingSenderId: "859655692148",
-  appId: "1:859655692148:web:c6ddb4601a4c45efd79621",
-  measurementId: "G-CLRZBQ8FN6"
+  apiKey: "AIzaSyDGZzNQqjWkt3m3mNDd5yUk5ocAXvyQ6dQ",
+  authDomain: "sens-8274a.firebaseapp.com",
+  databaseURL: "https://sens-8274a-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "sens-8274a",
+  storageBucket: "sens-8274a.appspot.com",
+  messagingSenderId: "352754779211",
+  appId: "1:352754779211:web:b7de7aa8d916bfdb5ef9ce"
 };
 
 const app = initializeApp(firebaseConfig);

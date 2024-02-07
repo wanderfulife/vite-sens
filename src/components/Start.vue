@@ -136,7 +136,7 @@ import { collection, doc, getDoc, getDocs, updateDoc, addDoc } from "firebase/fi
 import * as XLSX from "xlsx";
 
 const surveyCollectionRef = collection(db, "Sens");
-const surveyNumber = ref(0); // collect onMount\
+const surveyNumber = ref(0);
 const level = ref(0);
 const startDate = ref('');
 const enqueteur = ref('');
@@ -171,7 +171,7 @@ const back = () => {
 }
 
 const fetchSurveyNumber = async () => {
-	const surveyRef = doc(db, "enquete-sens", "enquete");
+	const surveyRef = doc(db, "Counters", "sens");
 	const docSnap = await getDoc(surveyRef);
 	if (docSnap.exists() && docSnap.data().numero !== undefined) {
 		surveyNumber.value = docSnap.data().numero;
@@ -184,9 +184,9 @@ const fetchSurveyNumber = async () => {
 // Function to increment and update the survey number in Firebase
 const updateSurveyNumber = async () => {
 	const newNumber = surveyNumber.value + 1; // Increment the survey number
-	const surveyRef = doc(db, "enquete-sens", "enquete");
+	const surveyRef = doc(db, "Counters", "sens");
 	await updateDoc(surveyRef, {
-		numero: newNumber
+		counter: newNumber
 	});
 	surveyNumber.value = newNumber; // Update the local ref
 };

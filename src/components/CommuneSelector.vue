@@ -1,7 +1,7 @@
 <template>
   <div class="form-group">
     <input class="form-control" type="text" v-model="localPostalCodePrefix"
-      placeholder="Code Postal (Premiers chiffres)" />
+      placeholder="Code Postal" />
     <input class="form-control" type="text" :value="modelValue" @input="updateCommune($event.target.value)"
       placeholder="COMMUNE" />
 

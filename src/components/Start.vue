@@ -122,7 +122,7 @@
 			<button @click="back" class="btn-return">retour</button>
 		</div>
 		<img class="logo" src="../assets/Alycelogo.webp" alt="Logo Alyce">
-		<button class="btn-fin" @click="downloadData">download DATA</button>
+		<!-- <button class="btn-fin" @click="downloadData">download DATA</button> -->
 	</div>
 </template>
 
